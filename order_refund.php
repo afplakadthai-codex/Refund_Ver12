@@ -3310,7 +3310,7 @@ if (!function_exists('bv_order_refund_mark_refunded')) {
                 // we have not already flagged it as email-sent in this process.
                 // bv_order_refund_send_completed_notifications_once() has its own
                 // static guard; the DB-backed guard inside it prevents cross-process replay.
-                if ($currentHeaderStatus === 'refunded') {
+                 if (in_array($currentHeaderStatus, ['refunded', 'partially_refunded'], true)) {
                     bv_order_refund_send_completed_notifications_once((int)$refundId);
                 }
                 return bv_order_refund_get_by_id($refundId) ?? [];
@@ -3345,7 +3345,7 @@ if (!function_exists('bv_order_refund_mark_refunded')) {
                     // completed, send the notification via the exact-once helper.
                     $freshForNotify = bv_order_refund_get_by_id($refundId);
                     $freshStatus = strtolower(trim((string)($freshForNotify['status'] ?? '')));
-                    if ($freshStatus === 'refunded') {
+                     if (in_array($freshStatus, ['refunded', 'partially_refunded'], true)) {
                         bv_order_refund_send_completed_notifications_once((int)$refundId);
                     }
                     return $freshForNotify ?? [];
